@@ -4,7 +4,7 @@ import logging
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.redis import RedisStorage
 from config_data.config import Config, load_config
-from handlers import admin_main_handlers, user_handler, other_handlers, hadler_calendar
+from handlers import user_handler, other_handlers, hadler_calendar
 from aiogram.types import FSInputFile
 
 from database.models import async_main
@@ -22,8 +22,8 @@ async def main():
     # Конфигурируем логирование
     logging.basicConfig(
         level=logging.INFO,
-        # filename="py_log.log",
-        # filemode='w',
+        filename="py_log.log",
+        filemode='w',
         format='%(filename)s:%(lineno)d #%(levelname)-8s '
                '[%(asctime)s] - %(name)s - %(message)s')
 
@@ -40,7 +40,6 @@ async def main():
     # Регистрируем router в диспетчере
     dp.include_router(user_handler.router)
     dp.include_router(hadler_calendar.router)
-    dp.include_router(admin_main_handlers.router)
     dp.include_router(other_handlers.router)
 
     @dp.error()
