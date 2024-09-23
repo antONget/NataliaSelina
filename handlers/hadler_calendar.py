@@ -56,6 +56,8 @@ async def process_simple_calendar_start(callback_query: CallbackQuery, callback_
         if len(event_list) >= 6:
             await callback_query.answer(text=f'На выбранную дату свободных слотов для консультации нет',
                                         show_alert=True)
+            await set_calendar(message=callback_query.message, state=state)
+            return
         await callback_query.message.answer(text=f'Выберите время для записи на {data_note}',
                                             reply_markup=kb.keyboards_slots(list_event=event_list))
     else:
