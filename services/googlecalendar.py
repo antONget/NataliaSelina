@@ -30,16 +30,16 @@ class GoogleCalendar(object):
         return self.service.calendarList().insert(
             body=calendar_list_entry).execute()
 
-    def create_event(self,  summary: str, description: str, time_dict: dict):
+    def create_event(self,  summary: str, description: str, time_dict: dict, data_event: str):
         event = {
             'summary': summary,
             'description': description,
             'start': {
-                'dateTime': f'2024-09-22T{time_dict["H1"]}:{time_dict["M1"]}:00+03:00',
+                'dateTime': f'{data_event}T{time_dict["H1"]}:{time_dict["M1"]}:00+03:00',
                 'timeZone': 'Europe/Moscow'
             },
             'end': {
-                'dateTime': f'2024-09-22T{time_dict["H2"]}:{time_dict["M2"]}:00+03:00',
+                'dateTime': f'{data_event}T{time_dict["H2"]}:{time_dict["M2"]}:00+03:00',
                 'timeZone': 'Europe/Moscow'
             },
         }

@@ -17,25 +17,8 @@ class User(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     tg_id = mapped_column(Integer)
     username: Mapped[str] = mapped_column(String(20))
-
-
-class Place(Base):
-    __tablename__ = 'places'
-
-    id: Mapped[int] = mapped_column(primary_key=True)
-    title: Mapped[str] = mapped_column(String(20))
-    short_description: Mapped[str] = mapped_column(String(20))
-    long_description: Mapped[str] = mapped_column(String(20))
-    address: Mapped[str] = mapped_column(String(20))
-    instagram: Mapped[str] = mapped_column(String(20))
-    yandex_map: Mapped[str] = mapped_column(String(20))
-    list_image: Mapped[str] = mapped_column(String(20))
-    category: Mapped[str] = mapped_column(String(20))
-    sub_category: Mapped[str] = mapped_column(String(20))
-    count_link: Mapped[int] = mapped_column(Integer)
-    position: Mapped[int] = mapped_column(Integer, default=0)
-    pos_cat: Mapped[int] = mapped_column(Integer, default=0)
-    pos_sub: Mapped[int] = mapped_column(Integer, default=0)
+    fullname: Mapped[str] = mapped_column(String, default='none')
+    phone: Mapped[str] = mapped_column(String, default='none')
 
 
 async def async_main():

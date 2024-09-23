@@ -51,9 +51,9 @@ async def process_simple_calendar_start(callback_query: CallbackQuery, callback_
     if selected:
         data_note = date.strftime("%Y-%m-%d")
         await state.update_data(data_note=date.strftime("%d-%m-%Y"))
-
+        await state.update_data(data_event=data_note)
         event_list = calendarG.get_event(data=data_note)
-        if len(event_list) == 6:
+        if len(event_list) >= 6:
             await callback_query.answer(text=f'На выбранную дату свободных слотов для консультации нет',
                                         show_alert=True)
         await callback_query.message.answer(text=f'Выберите время для записи на {data_note}',
@@ -77,7 +77,7 @@ async def get_time_slot(callback: CallbackQuery, state: FSMContext, bot: Bot):
     event_finish = (datetime.combine(datetime.today(), event_start) + timedelta(minutes=40)).time()
     event_finish_str = event_finish.strftime("%H:%M")
     H2 = int(event_finish_str.split(":")[0])
-    M2 = int(event_finish_str.split(":")[0])
+    M2 = int(event_finish_str.split(":")[1])
     time_dict = {"H1": H1, "M1": M1, "H2": H2, "M2": M2}
     await state.update_data(time_dict=time_dict)
     await state.update_data(slot_time=slot_time)
@@ -107,9 +107,11 @@ async def confirm_order(callback: CallbackQuery, state: FSMContext, bot: Bot):
                     "8": "Менторство врачей"}
     time_dict = data['time_dict']
     slot_time = data['slot_time']
+    data_event = data['data_event']
     calendarG.create_event(summary=f'Пользователь {data["fullname"]} приобрел продукт "{type_product[data["item"]]}"',
                            description=f'ФИО: {data["fullname"]}\nТелефон: {data["phone"]}',
-                           time_dict=time_dict)
+                           time_dict=time_dict,
+                           data_event=data_event)
     for admin in config.tg_bot.admin_ids.split(','):
         try:
             await bot.send_message(chat_id=admin,
@@ -117,8 +119,8 @@ async def confirm_order(callback: CallbackQuery, state: FSMContext, bot: Bot):
                                         f'"{type_product[data["item"]]}"\n'
                                         f'ФИО: {data["fullname"]}\n'
                                         f'Телефон: {data["phone"]}\n'
-                                        f'Дата консультации: {data["data_note"]}'
-                                        f'Время консультации: {slot_time}\n'
+                                        f'Дата консультации: {data["data_note"]}\n'
+                                        f'Время консультации: {slot_time}\n\n'
                                         f'Нажмите кнопку "Консультация проведена" для получения отзыва от клиента',
                                    reply_markup=kb.keyboard_feedback(tg_id=callback.message.chat.id))
         except:
