@@ -20,6 +20,8 @@ def keyboards_slots(list_event: list):
     my_time = time(hour=hour, minute=minute)
     time_stop = time(hour=18, minute=0)
     while True:
+        if my_time >= time_stop:
+            break
         for event in list_event:
             dateTime = event['start']['dateTime']
             Time = dateTime.split('T')[1]
@@ -42,8 +44,7 @@ def keyboards_slots(list_event: list):
                 callback_data=button))
             # Увеличиваем время на 40 минут
             my_time = (datetime.combine(datetime.today(), my_time) + timedelta(minutes=40)).time()
-            if my_time >= time_stop:
-                break
+
     kb_builder.row(*buttons, width=3)
     return kb_builder.as_markup()
 
