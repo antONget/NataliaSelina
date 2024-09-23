@@ -62,7 +62,11 @@ async def process_simple_calendar_start(callback_query: CallbackQuery, callback_
 
 @router.callback_query(lambda callback: 'slot' in callback.data)
 async def get_time_slot(callback: CallbackQuery, state: FSMContext, bot: Bot):
+    logging.info(f'get_time_slot {callback.message.chat.id}')
     slot_time = callback.data.split('_')[1]
+    if slot_time == '❌':
+        await callback.answer(text='Это время занято выберите другое время или дату', show_alert=True)
+        return
     data = await state.get_data()
     H1 = int(slot_time.split(":")[0])
     M1 = int(slot_time.split(":")[1])
@@ -88,6 +92,7 @@ async def confirm_order(callback: CallbackQuery, state: FSMContext, bot: Bot):
                                  message_id=callback.message.message_id)
         await set_calendar(message=callback.message, state=state)
         await callback.answer()
+        return
     data = await state.get_data()
     type_product = {"1": "Экспресс -консультация",
                     "2": "Консультация с разбором анализов и назначений",
