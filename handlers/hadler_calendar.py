@@ -49,8 +49,8 @@ async def process_simple_calendar_start(callback_query: CallbackQuery, callback_
     calendar.set_dates_range(datetime(2022, 1, 1), datetime(2030, 12, 31))
     selected, date = await calendar.process_selection(callback_query, callback_data)
     if selected:
-        data_note = date.strftime("%d%-%m-%Y")
-        await state.update_data(data_note=data_note)
+        data_note = date.strftime("%Y-%m-%d")
+        await state.update_data(data_note=date.strftime("%d-%m-%Y"))
         # await callback_query.answer(text=f'Вы выбрали {data_note}', show_alert=True)
         event_list = calendarG.get_event(data=data_note)
         await callback_query.message.answer(text=f'Выберите время для записи на {data_note}',
