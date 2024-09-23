@@ -27,6 +27,11 @@ def keyboards_slots(list_event: list):
             minute_event = Time.split(":")[1]
             time_event = time(hour=int(hour_event), minute=int(minute_event))
             if time_event == my_time:
+                text = f'{my_time.strftime("%H:%M")} ❌'
+                button = f'slot_❌'
+                buttons.append(InlineKeyboardButton(
+                    text=text,
+                    callback_data=button))
                 my_time = (datetime.combine(datetime.today(), my_time) + timedelta(minutes=40)).time()
                 break
         else:
@@ -54,4 +59,12 @@ def keyboard_set_feedback() -> InlineKeyboardMarkup:
     logging.info("keyboard_feedback_user")
     button_1 = InlineKeyboardButton(text='Оставить отзыв', callback_data=f'set_feedback')
     keyboard = InlineKeyboardMarkup(inline_keyboard=[[button_1]],)
+    return keyboard
+
+
+def keyboard_confirm_slot() -> InlineKeyboardMarkup:
+    logging.info("keyboard_feedback_user")
+    button_1 = InlineKeyboardButton(text='Записаться', callback_data=f'order_confirm')
+    button_2 = InlineKeyboardButton(text='Изменить', callback_data=f'order_change')
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[[button_1], [button_2]],)
     return keyboard

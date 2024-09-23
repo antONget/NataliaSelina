@@ -63,14 +63,6 @@ async def process_simple_calendar_start(callback_query: CallbackQuery, callback_
 async def get_time_slot(callback: CallbackQuery, state: FSMContext, bot: Bot):
     slot_time = callback.data.split('_')[1]
     data = await state.get_data()
-    type_product = {"1": "Экспресс -консультация",
-                    "2": "Консультация с разбором анализов и назначений",
-                    "3": "Составление индивидуальной оздоровительной программы на 3 месяца",
-                    "4": "ВИП-программа по здоровью",
-                    "5": "Ведение в группе онлайн-детокс",
-                    "6": "Программа похудения на 3 месяца",
-                    "7": "Программа похудения на 1 месяц",
-                    "8": "Менторство врачей"}
     H1 = int(slot_time.split(":")[0])
     M1 = int(slot_time.split(":")[1])
     event_start = time(hour=H1, minute=M1)
@@ -79,6 +71,31 @@ async def get_time_slot(callback: CallbackQuery, state: FSMContext, bot: Bot):
     H2 = int(event_finish_str.split(":")[0])
     M2 = int(event_finish_str.split(":")[0])
     time_dict = {"H1": H1, "M1": M1, "H2": H2, "M2": M2}
+    await state.update_data(time_dict=time_dict)
+    await callback.message.edit_text(text=f'Записать вас на {data["data_note"]} - {time_dict["H1"]}:{time_dict["M1"]}?',
+                                     reply_markup=kb.keyboard_confirm_slot())
+    await callback.answer()
+
+
+@router.callback_query(F.data.startswith('order_'))
+async def confirm_order(callback: CallbackQuery, state: FSMContext, bot: Bot):
+    logging.info(f'confirm_order {callback.message.chat.id}')
+    answer = callback.data.split('_')[-1]
+    if answer == 'change':
+        await bot.delete_message(chat_id=callback.message.chat.id,
+                                 message_id=callback.message.message_id)
+        await set_calendar(message=callback.message, state=state)
+        await callback.answer()
+    data = await state.get_data()
+    type_product = {"1": "Экспресс -консультация",
+                    "2": "Консультация с разбором анализов и назначений",
+                    "3": "Составление индивидуальной оздоровительной программы на 3 месяца",
+                    "4": "ВИП-программа по здоровью",
+                    "5": "Ведение в группе онлайн-детокс",
+                    "6": "Программа похудения на 3 месяца",
+                    "7": "Программа похудения на 1 месяц",
+                    "8": "Менторство врачей"}
+    time_dict = data['time_dict']
     calendarG.create_event(summary=f'Пользователь {data["fullname"]} приобрел продукт "{type_product[data["item"]]}"',
                            description=f'ФИО: {data["fullname"]}\nТелефон: {data["phone"]}',
                            time_dict=time_dict)
