@@ -37,7 +37,21 @@ def keyboards_slots(list_event: list):
                 callback_data=button))
             # Увеличиваем время на 40 минут
             my_time = (datetime.combine(datetime.today(), my_time) + timedelta(minutes=40)).time()
-            if my_time > time_stop:
+            if my_time >= time_stop:
                 break
     kb_builder.row(*buttons, width=3)
     return kb_builder.as_markup()
+
+
+def keyboard_feedback(tg_id: int) -> InlineKeyboardMarkup:
+    logging.info("keyboard_feedback")
+    button_1 = InlineKeyboardButton(text='Консультация проведена', callback_data=f'feed_back_{tg_id}')
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[[button_1]],)
+    return keyboard
+
+
+def keyboard_set_feedback() -> InlineKeyboardMarkup:
+    logging.info("keyboard_feedback_user")
+    button_1 = InlineKeyboardButton(text='Оставить отзыв', callback_data=f'set_feedback')
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[[button_1]],)
+    return keyboard

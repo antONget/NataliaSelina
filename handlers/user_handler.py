@@ -1,5 +1,5 @@
 from aiogram import Router, F, Bot
-from aiogram.filters import CommandStart, StateFilter
+from aiogram.filters import CommandStart, StateFilter, or_f
 from aiogram.types import Message, CallbackQuery, ReplyKeyboardRemove
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
@@ -15,6 +15,8 @@ from handlers.hadler_calendar import set_calendar
 
 import re
 import logging
+import random
+import asyncio
 router = Router()
 # Загружаем конфиг в переменную config
 config: Config = load_config()
@@ -23,6 +25,7 @@ config: Config = load_config()
 class User(StatesGroup):
     fullname = State()
     phone = State()
+    content = State()
 
 
 @router.message(CommandStart())
@@ -329,8 +332,109 @@ async def check_pay(callback: CallbackQuery, state: FSMContext, bot: Bot):
         await bot.delete_message(chat_id=callback.message.chat.id,
                                  message_id=callback.message.message_id)
         await callback.answer(text='Платеж прошел успешно', show_alert=True)
-        await set_calendar(message=callback.message, state=state)
+        data = await state.get_data()
+        item = data['item']
+        if item == '1':
+            await callback.message.answer(text='Пришлите материалы для консультации\n'
+                                               '📎 Прикрепите фото (можно несколько), видео или документ.')
+            await state.set_state(User.content)
+            await state.update_data(content=[])
+            await state.update_data(count=[])
+        else:
+            await set_calendar(message=callback.message, state=state)
     else:
         await callback.message.answer(text='Платеж не прошел')
     await callback.answer()
+
+
+@router.message(StateFilter(User.content), or_f(F.document, F.photo, F.video))
+async def request_content_photo_text(message: Message, state: FSMContext):
+    """
+    Получаем от пользователя контент для публикации
+    :param message:
+    :param state:
+    :return:
+    """
+    logging.info(f'request_content_photo_text {message.chat.id}')
+    await asyncio.sleep(random.random())
+    data = await state.get_data()
+    list_content = data.get('content', [])
+    count = data.get('count', [])
+    if message.text:
+        await message.answer(text=f'📎 Прикрепите фото (можно несколько), видео или документ.')
+        return
+    elif message.photo:
+        content = message.photo[-1].file_id
+        if message.caption:
+            caption = message.caption
+        else:
+            caption = 'None'
+        await state.update_data(caption=caption)
+
+    elif message.video:
+        content = message.video.file_id
+        if message.caption:
+            caption = message.caption
+        else:
+            caption = 'None'
+        await state.update_data(caption=caption)
+
+    elif message.document:
+        content = message.document.file_id
+        if message.caption:
+            caption = message.caption
+        else:
+            caption = 'None'
+        await state.update_data(caption=caption)
+
+    list_content.append(content)
+    count.append(content)
+    await state.update_data(content=list_content)
+    await state.update_data(count=count)
+    await state.set_state(state=None)
+    if len(count) == 1:
+        await message.answer(text='Добавить еще материал или отправить?',
+                             reply_markup=kb.keyboard_send())
+
+
+@router.callback_query(F.data.endswith('content'))
+async def send_add_content(callback: CallbackQuery, state: FSMContext, bot: Bot):
+    logging.info(f'send_add_content {callback.message.chat.id}')
+    answer = callback.data.split('_')[0]
+
+    if answer == 'add':
+        await state.set_state(User.content)
+        await state.update_data(count=[])
+        await callback.message.edit_text(text='Пришлите материалы для консультации\n'
+                                              '📎 Прикрепите фото (можно несколько), видео или документ.')
+    else:
+        await callback.message.edit_text(text='Материалы от вас переданы\n\n'
+                                              'Спасибо! С вами свяжутся',
+                                         reply_markup=None)
+        data = await state.get_data()
+        content = data['content']
+        print(content)
+        for admin in config.tg_bot.admin_ids.split(','):
+            try:
+                # content_list = content.split(',')
+                for item in content:
+                    try:
+                        await bot.send_photo(chat_id=admin,
+                                             photo=item)
+                    except:
+                        try:
+                            await bot.send_video(chat_id=admin,
+                                                 video=item)
+                        except:
+                            await bot.send_document(chat_id=admin,
+                                                    document=item)
+                await bot.send_message(chat_id=admin,
+                                       text=f'Пользователь @{callback.from_user.username}'
+                                            f' {data["fullname"]} приобрел "Экспресс-консультация"\n'
+                                            f'ФИО: {data["fullname"]}\n'
+                                            f'Телефон: {data["phone"]}')
+            except:
+                pass
+    await callback.answer()
+
 

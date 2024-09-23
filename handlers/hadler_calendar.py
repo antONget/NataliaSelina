@@ -17,6 +17,7 @@ config: Config = load_config()
 
 class Calendar(StatesGroup):
     start = State()
+    feedbak = State()
 
 
 async def set_calendar(message: Message, state: FSMContext) -> None:
@@ -51,7 +52,7 @@ async def process_simple_calendar_start(callback_query: CallbackQuery, callback_
         data_note = date.strftime("%Y-%m-%d")
         # await callback_query.answer(text=f'Вы выбрали {data_note}', show_alert=True)
         event_list = calendarG.get_event(data=data_note)
-        await callback_query.message.answer(text='Выберите время для записи',
+        await callback_query.message.answer(text=f'Выберите время для записи на {data_note}',
                                             reply_markup=kb.keyboards_slots(list_event=event_list))
     else:
         await callback_query.answer(text=f'Вы ничего выбрали', show_alert=True)
@@ -84,9 +85,60 @@ async def get_time_slot(callback: CallbackQuery, state: FSMContext, bot: Bot):
     for admin in config.tg_bot.admin_ids.split(','):
         try:
             await bot.send_message(chat_id=admin,
-                                   text=f'Пользователь {data["fullname"]} приобрел продукт'
-                                        f' "{type_product[data["item"]]}"\n'
-                                        f'ФИО: {data["fullname"]}\nТелефон: {data["phone"]}')
+                                   text=f'Пользователь @{callback.from_user.username} приобрел продукт '
+                                        f'"{type_product[data["item"]]}"\n'
+                                        f'ФИО: {data["fullname"]}\n'
+                                        f'Телефон: {data["phone"]}\n'
+                                        f'Время консультации: {time_dict["H1"]}:{time_dict["M1"]}\n'
+                                        f'Нажмите кнопку "Консультация проведена" для получения отзыва от клиента',
+                                   reply_markup=kb.keyboard_feedback(tg_id=callback.message.chat.id))
         except:
             pass
+    await callback.message.edit_text(text=f'Вы записаны на {data["data_note"]} - {time_dict["H1"]}:{time_dict["M1"]}.\n\n'
+                                          f'Спасибо! С вами свяжутся',
+                                     reply_markup=None)
     await callback.answer()
+
+
+@router.callback_query(F.data.startswith('feed_back_'))
+async def get_feedback(callback: CallbackQuery, bot: Bot):
+    logging.info(f'get_feedback {callback.message.chat.id}')
+    await callback.message.edit_text(text='Запрос на отзыв направлен клиенту',
+                                     reply_markup=None)
+    try:
+        await bot.send_message(chat_id=callback.data.split('_')[-1],
+                               text='Оставьте отзыв о проведенной консультации',
+                               reply_markup=kb.keyboard_set_feedback())
+    except:
+        pass
+    await callback.answer()
+
+
+@router.callback_query(F.data == 'set_feedback')
+async def set_feedback(callback: CallbackQuery, state: FSMContext):
+    logging.info(f'set_feedback {callback.message.chat.id}')
+    await callback.message.edit_text(text='Напишите ваши впечатления',
+                                     reply_markup=None)
+    await state.set_state(Calendar.feedbak)
+    await callback.answer()
+
+
+@router.message(F.text, StateFilter(Calendar.feedbak))
+async def text_feedback(message: Message, state: FSMContext, bot: Bot):
+    logging.info(f'text_feedback {message.chat.id}')
+    data = await state.get_data()
+    for admin in config.tg_bot.admin_ids.split(','):
+        try:
+            await bot.send_message(chat_id=admin,
+                                   text=f'Пользователь @{message.from_user.username}'
+                                        f' {data["fullname"]} "\n'
+                                        f'ФИО: {data["fullname"]}\n'
+                                        f'Телефон: {data["phone"]}\n'
+                                        f'Оставил отзыв:\n'
+                                        f'{message.text}')
+        except:
+            pass
+    await bot.delete_message(chat_id=message.chat.id,
+                             message_id=message.message_id - 1)
+    await message.answer(text=
+                         'Благодарю, Ваше мнение нам очень важен и будет полезен для повышения качества наших услуг')
