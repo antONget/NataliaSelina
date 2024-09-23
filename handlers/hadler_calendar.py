@@ -50,6 +50,7 @@ async def process_simple_calendar_start(callback_query: CallbackQuery, callback_
     selected, date = await calendar.process_selection(callback_query, callback_data)
     if selected:
         data_note = date.strftime("%Y-%m-%d")
+        await state.update_data(data_note=data_note)
         # await callback_query.answer(text=f'Вы выбрали {data_note}', show_alert=True)
         event_list = calendarG.get_event(data=data_note)
         await callback_query.message.answer(text=f'Выберите время для записи на {data_note}',
@@ -106,6 +107,7 @@ async def confirm_order(callback: CallbackQuery, state: FSMContext, bot: Bot):
                                         f'"{type_product[data["item"]]}"\n'
                                         f'ФИО: {data["fullname"]}\n'
                                         f'Телефон: {data["phone"]}\n'
+                                        f'Дата консультации: {data["data_note"]}'
                                         f'Время консультации: {time_dict["H1"]}:{time_dict["M1"]}\n'
                                         f'Нажмите кнопку "Консультация проведена" для получения отзыва от клиента',
                                    reply_markup=kb.keyboard_feedback(tg_id=callback.message.chat.id))
