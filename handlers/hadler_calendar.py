@@ -49,7 +49,7 @@ async def process_simple_calendar_start(callback_query: CallbackQuery, callback_
     calendar.set_dates_range(datetime(2022, 1, 1), datetime(2030, 12, 31))
     selected, date = await calendar.process_selection(callback_query, callback_data)
     if selected:
-        data_note = date.strftime("%Y-%m-%d")
+        data_note = date.strftime("%d%-$m-%Y")
         await state.update_data(data_note=data_note)
         # await callback_query.answer(text=f'Вы выбрали {data_note}', show_alert=True)
         event_list = calendarG.get_event(data=data_note)
@@ -73,7 +73,8 @@ async def get_time_slot(callback: CallbackQuery, state: FSMContext, bot: Bot):
     M2 = int(event_finish_str.split(":")[0])
     time_dict = {"H1": H1, "M1": M1, "H2": H2, "M2": M2}
     await state.update_data(time_dict=time_dict)
-    await callback.message.edit_text(text=f'Записать вас на {data["data_note"]} - {time_dict["H1"]}:{time_dict["M1"]}?',
+    await state.update_data(slot_time=slot_time)
+    await callback.message.edit_text(text=f'Записать вас на {data["data_note"]} - {slot_time}?',
                                      reply_markup=kb.keyboard_confirm_slot())
     await callback.answer()
 
@@ -97,6 +98,7 @@ async def confirm_order(callback: CallbackQuery, state: FSMContext, bot: Bot):
                     "7": "Программа похудения на 1 месяц",
                     "8": "Менторство врачей"}
     time_dict = data['time_dict']
+    slot_time = data['slot_time']
     calendarG.create_event(summary=f'Пользователь {data["fullname"]} приобрел продукт "{type_product[data["item"]]}"',
                            description=f'ФИО: {data["fullname"]}\nТелефон: {data["phone"]}',
                            time_dict=time_dict)
@@ -108,12 +110,12 @@ async def confirm_order(callback: CallbackQuery, state: FSMContext, bot: Bot):
                                         f'ФИО: {data["fullname"]}\n'
                                         f'Телефон: {data["phone"]}\n'
                                         f'Дата консультации: {data["data_note"]}'
-                                        f'Время консультации: {time_dict["H1"]}:{time_dict["M1"]}\n'
+                                        f'Время консультации: {slot_time}\n'
                                         f'Нажмите кнопку "Консультация проведена" для получения отзыва от клиента',
                                    reply_markup=kb.keyboard_feedback(tg_id=callback.message.chat.id))
         except:
             pass
-    await callback.message.edit_text(text=f'Вы записаны на {data["data_note"]} - {time_dict["H1"]}:{time_dict["M1"]}.\n\n'
+    await callback.message.edit_text(text=f'Вы записаны на {data["data_note"]} - {slot_time}.\n\n'
                                           f'Спасибо! С вами свяжутся',
                                      reply_markup=None)
     await callback.answer()
