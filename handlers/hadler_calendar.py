@@ -51,8 +51,11 @@ async def process_simple_calendar_start(callback_query: CallbackQuery, callback_
     if selected:
         data_note = date.strftime("%Y-%m-%d")
         await state.update_data(data_note=date.strftime("%d-%m-%Y"))
-        # await callback_query.answer(text=f'Вы выбрали {data_note}', show_alert=True)
+
         event_list = calendarG.get_event(data=data_note)
+        if len(event_list) == 6:
+            await callback_query.answer(text=f'На выбранную дату свободных слотов для консультации нет',
+                                        show_alert=True)
         await callback_query.message.answer(text=f'Выберите время для записи на {data_note}',
                                             reply_markup=kb.keyboards_slots(list_event=event_list))
     else:
