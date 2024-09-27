@@ -14,7 +14,7 @@ class GoogleCalendar(object):
     CALENDAR_ID = 'detox.tour.turkey@gmail.com'
     SCOPES = ['https://www.googleapis.com/auth/calendar']
     # FILE_PATH = 'calendar_google.json'
-    FILE_PATH = 'credentials.json'
+    FILE_PATH = 'services/credentials.json'
 
 
     def __init__(self):
