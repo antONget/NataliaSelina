@@ -53,14 +53,14 @@ async def process_start_command_user(message: Message, state: FSMContext) -> Non
 
 
 @router.callback_query(F.data == 'support')
-async def process_question(message: Message) -> None:
+async def process_question(callback: CallbackQuery) -> None:
     """
     Обработка обратной связи
     :param message:
     :return:
     """
-    logging.info(f'process_question: {message.chat.id}')
-    await message.answer(text=f'Если у вас возникли вопросы по работе бота или у вас есть предложения,'
+    logging.info(f'process_question: {callback.message.chat.id}')
+    await callback.message.answer(text=f'Если у вас возникли вопросы по работе бота или у вас есть предложения,'
                               f' то можете написать {config.tg_bot.support_username}')
 
 
