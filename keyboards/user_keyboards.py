@@ -12,13 +12,45 @@ def keyboard_start_menu():
     button_4 = InlineKeyboardButton(text='👤/👥 КАК ВЫБРАТЬ ПРОГРАММУ?', callback_data=f'select_product')
     button_5 = InlineKeyboardButton(text='👩‍💻 ПОДДЕРЖКА', callback_data=f'support')
 
-    keyboard = InlineKeyboardMarkup(inline_keyboard=[[button_1], [button_2], [button_3], [button_6], [button_4], [button_5]],)
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[[button_1], [button_2], [button_3],
+                                                     [button_6], [button_4], [button_5]],)
+    return keyboard
+
+
+def keyboard_start_menu():
+    logging.info("keyboard_start_menu")
+    button_1 = InlineKeyboardButton(text='Экспресс -консультация',  callback_data=f'consultation_product')
+    button_2 = InlineKeyboardButton(text='Оздоровительная программа', callback_data=f'wellness_product')
+    button_3 = InlineKeyboardButton(text='Программа похудения', callback_data=f'weightloss_product')
+    button_6 = InlineKeyboardButton(text='Медийный врач', callback_data=f'mentoring_product')
+    button_4 = InlineKeyboardButton(text='👤/👥 КАК ВЫБРАТЬ ПРОГРАММУ?', callback_data=f'select_product')
+    button_5 = InlineKeyboardButton(text='👩‍💻 ПОДДЕРЖКА', callback_data=f'support')
+
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[[button_1], [button_2], [button_3],
+                                                     [button_6], [button_4], [button_5]],)
+    return keyboard
+
+
+def keyboard_select_programm():
+    logging.info("keyboard_select_programm")
+    button_1 = InlineKeyboardButton(text='Экспресс - консультация',  callback_data=f'item_1')
+    button_2 = InlineKeyboardButton(text='Консультация с разбором анализов и назначений', callback_data=f'item_2')
+    button_3 = InlineKeyboardButton(text='Индивидуальная оздоровительная программа', callback_data=f'item_3')
+    button_4 = InlineKeyboardButton(text='ВИП-программа по здоровью', callback_data=f'item_4')
+    button_5 = InlineKeyboardButton(text='Группа онлайн-детокс', callback_data=f'item_5')
+    button_6 = InlineKeyboardButton(text='Похудение индивидуально', callback_data=f'item_6')
+    button_7 = InlineKeyboardButton(text='Похудение группа', callback_data=f'item_7')
+    button_8 = InlineKeyboardButton(text='Медийный врач', callback_data=f'mentoring_product')
+
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[[button_1], [button_2], [button_3],
+                                                     [button_6], [button_4], [button_5],
+                                                     [button_7], [button_8]],)
     return keyboard
 
 
 def keyboard_consultation():
     logging.info("keyboard_consultation")
-    button_1 = InlineKeyboardButton(text='Экспресс -консультация',  callback_data=f'item_1')
+    button_1 = InlineKeyboardButton(text='Экспресс - консультация',  callback_data=f'item_1')
     button_2 = InlineKeyboardButton(text='Консультация с разбором анализов и назначений', callback_data=f'item_2')
 
     keyboard = InlineKeyboardMarkup(inline_keyboard=[[button_1], [button_2]],)
@@ -37,8 +69,18 @@ def keyboard_wellness():
 def keyboard_weightloss():
     logging.info("keyboard_wellness")
     button_1 = InlineKeyboardButton(text='Группа онлайн-детокс',  callback_data=f'item_5')
-    button_2 = InlineKeyboardButton(text='Программа на 3 месяца', callback_data=f'item_6')
-    button_3 = InlineKeyboardButton(text='Программа на 1 месяц', callback_data=f'item_7')
+    button_2 = InlineKeyboardButton(text='Похудение индивидуально', callback_data=f'item_indvidual')
+    button_3 = InlineKeyboardButton(text='Похудение группа', callback_data=f'item_7')
+
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[[button_1], [button_2], [button_3]],)
+    return keyboard
+
+
+def keyboard_long_period():
+    logging.info("keyboard_wellness")
+    button_1 = InlineKeyboardButton(text='1 месяц',  callback_data=f'item_6')
+    button_2 = InlineKeyboardButton(text='3 месяца', callback_data=f'item_9')
+    button_3 = InlineKeyboardButton(text='6 месяцев', callback_data=f'item_10')
 
     keyboard = InlineKeyboardMarkup(inline_keyboard=[[button_1], [button_2], [button_3]],)
     return keyboard

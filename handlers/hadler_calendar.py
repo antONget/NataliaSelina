@@ -111,7 +111,7 @@ async def confirm_order(callback: CallbackQuery, state: FSMContext, bot: Bot):
     slot_time = data['slot_time']
     data_event = data['data_event']
     calendarG.create_event(summary=f'Пользователь {data["fullname"]} приобрел продукт "{type_product[data["item"]]}"',
-                           description=f'ФИО: {data["fullname"]}\nТелефон: {data["phone"]}',
+                           description=f'ФИО: {data["fullname"]} Телефон: {data["phone"]}',
                            time_dict=time_dict,
                            data_event=data_event)
     for admin in config.tg_bot.admin_ids.split(','):
