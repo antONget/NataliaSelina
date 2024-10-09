@@ -130,7 +130,7 @@ def keyboards_get_contact() -> ReplyKeyboardMarkup:
 def keyboard_payment(payment_url: str, payment_id: int, amount: str) -> InlineKeyboardMarkup:
     logging.info("keyboard_select_period_sales")
     button_1 = InlineKeyboardButton(text='Проверить оплату', callback_data=f'payment_{payment_id}')
-    button_2 = InlineKeyboardButton(text=f'Оплатить {amount} руб.', url=f'https://yookassa.ru/')
+    button_2 = InlineKeyboardButton(text=f'Оплатить {amount} руб.', url=payment_url)
     # button_2 = InlineKeyboardButton(text=f'Оплатить {amount} руб.', url=f'{payment_url}')
     keyboard = InlineKeyboardMarkup(inline_keyboard=[[button_2], [button_1]],)
     return keyboard
@@ -141,4 +141,11 @@ def keyboard_send() -> InlineKeyboardMarkup:
     button_1 = InlineKeyboardButton(text='Отправить', callback_data=f'send_content')
     button_2 = InlineKeyboardButton(text='Добавить', callback_data=f'add_content')
     keyboard = InlineKeyboardMarkup(inline_keyboard=[[button_2], [button_1]],)
+    return keyboard
+
+
+def keyboard_payment_invoice(amount: str) -> InlineKeyboardMarkup:
+    logging.info("keyboard_select_period_sales")
+    button_2 = InlineKeyboardButton(text=f'Оплатить {amount} руб.', callback_data='wish_pay')
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[[button_2],],)
     return keyboard

@@ -1,16 +1,16 @@
 from aiogram import Router, F, Bot
 from aiogram.filters import CommandStart, StateFilter, or_f
-from aiogram.types import Message, CallbackQuery, ReplyKeyboardRemove
+from aiogram.types import Message, CallbackQuery, ReplyKeyboardRemove, PreCheckoutQuery
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
-
+from aiogram.types import LabeledPrice
 
 from keyboards import user_keyboards as kb
 from filter.admin_filter import IsSuperAdmin
 from config_data.config import Config, load_config
 from database import requests as rq
 from filter.filter import validate_russian_phone_number
-from services.payments import create_payment, check_payment
+from services.payments import create_payment, check_payment, create_payment_
 from handlers.hadler_calendar import set_calendar
 from fluentogram import TranslatorRunner
 
@@ -289,14 +289,59 @@ async def get_phone_user(message: Message, state: FSMContext, i18n: TranslatorRu
                    "5": "10000", "6": "90000", "7": "50000", "8": "300000"}
     amount = item_amount[item]
     content = type_product[item]
+    amount = "10"
     await message.answer(text='Отлично, ваши данные успешно записаны!',
                          reply_markup=kb.keyboard_main_menu())
-    # payment_url, payment_id = create_payment(amount=amount, chat_id=message.chat.id, content=content)
+    await state.update_data(content=content)
+    await state.update_data(amount=int(amount))
+    # await message.answer(text=f'Оплатите продукт "{content}", после оплаты нажмите на кнопку «Проверить оплату» ⬇️ '
+    #                           f'для выбора времени консультации',
+    #                      reply_markup=kb.keyboard_payment_invoice(amount=amount))
+    payment_url, payment_id = create_payment(amount=amount, chat_id=message.chat.id, content=content)
     await message.answer(text=f'Оплатите продукт "{content}", после оплаты нажмите на кнопку «Проверить оплату» ⬇️ '
                               f'для выбора времени консультации',
-                         reply_markup=kb.keyboard_payment(payment_url="payment_url",
-                                                          payment_id=0,
+                         reply_markup=kb.keyboard_payment(payment_url=payment_url,
+                                                          payment_id=payment_id,
                                                           amount=amount))
+
+
+@router.callback_query(F.data == 'wish_pay')
+async def wish_payment(callback: CallbackQuery, bot: Bot, state: FSMContext):
+    data = await state.get_data()
+    await bot.send_invoice(
+        chat_id=callback.message.chat.id,
+        title='Покупка',
+        description=data['content'],
+        payload=f'pay_{callback.message.chat.id}',
+        provider_token=config.tg_bot.yookassa_id,
+        currency='RUB',
+        start_parameter='test',
+        prices=[LabeledPrice(label="Руб.", amount=data["amount"]*100)]
+    )
+
+
+@router.pre_checkout_query()
+async def process_pre_checkout_query(pre_checkout_query: PreCheckoutQuery, bot: Bot):
+    logging.info('process_pre_checkout_query')
+    await bot.answer_pre_checkout_query(pre_checkout_query_id=pre_checkout_query.id, ok=True)
+
+
+@router.message(F.successful_payment)
+async def process_successful_payment(message: Message, state: FSMContext):
+    if message.successful_payment.invoice_payload == 'pay_{callback.message.chat.id}':
+        await message.answer(text='Платеж прошел успешно')
+        data = await state.get_data()
+        item = data['item']
+        if item == '1':
+            await message.answer(text='Пришлите материалы для консультации\n'
+                                      '📎 Прикрепите фото (можно несколько), видео или документ.')
+            await state.set_state(User.content)
+            await state.update_data(content=[])
+            await state.update_data(count=[])
+        else:
+            await set_calendar(message=message, state=state)
+    else:
+        await message.answer(text='Платеж не прошел')
 
 
 @router.callback_query(F.data.startswith('payment_'))
@@ -309,9 +354,9 @@ async def check_pay(callback: CallbackQuery, state: FSMContext, bot: Bot):
     :return:
     """
     logging.info(f'check_pay {callback.message.chat.id}')
-    # payment_id = callback.data.split('_')[1]
-    # result = check_payment(payment_id=payment_id)
-    result = 'succeeded'
+    payment_id = callback.data.split('_')[1]
+    result = check_payment(payment_id=payment_id)
+    # result = 'succeeded'
     if result == 'succeeded':
         await bot.delete_message(chat_id=callback.message.chat.id,
                                  message_id=callback.message.message_id)
