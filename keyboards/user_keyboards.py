@@ -51,7 +51,7 @@ def keyboard_select_programm():
 def keyboard_consultation():
     logging.info("keyboard_consultation")
     button_1 = InlineKeyboardButton(text='Экспресс - консультация',  callback_data=f'item_1')
-    button_2 = InlineKeyboardButton(text='Нутрициолог', callback_data=f'item_2')
+    button_2 = InlineKeyboardButton(text='Онлайн - консультация', callback_data=f'item_2')
 
     keyboard = InlineKeyboardMarkup(inline_keyboard=[[button_1], [button_2]],)
     return keyboard

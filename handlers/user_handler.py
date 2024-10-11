@@ -289,7 +289,7 @@ async def get_phone_user(message: Message, state: FSMContext, i18n: TranslatorRu
                    "5": "10000", "6": "90000", "7": "50000", "8": "300000"}
     amount = item_amount[item]
     content = type_product[item]
-    amount = "10"
+    # amount = "10"
     await message.answer(text='Отлично, ваши данные успешно записаны!',
                          reply_markup=kb.keyboard_main_menu())
     await state.update_data(content=content)
