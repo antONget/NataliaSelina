@@ -44,8 +44,12 @@ async def process_start_command_user(message: Message, state: FSMContext, i18n: 
     # await set_calendar(message=message, state=state)
     # return
     await state.set_state(state=None)
+    if message.from_user.username:
+        username = message.from_user.username
+    else:
+        username = "user_name"
     await rq.add_user(tg_id=message.chat.id,
-                      data={"tg_id": message.chat.id, "username": message.from_user.username})
+                      data={"tg_id": message.chat.id, "username": username})
     await message.answer(text=f'Добро пожаловать!',
                          reply_markup=kb.keyboard_main_menu())
     await message.answer(text=i18n.start.text(),
