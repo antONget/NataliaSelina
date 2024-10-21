@@ -15,6 +15,7 @@ import logging
 router = Router()
 config: Config = load_config()
 
+
 class Calendar(StatesGroup):
     start = State()
     feedbak = State()
@@ -45,6 +46,7 @@ async def set_calendar(message: Message, state: FSMContext) -> None:
 
 @router.callback_query(aiogram_calendar.SimpleCalendarCallback.filter(), StateFilter(Calendar.start))
 async def process_simple_calendar_start(callback_query: CallbackQuery, callback_data: CallbackData, state: FSMContext):
+    logging.info(f'process_simple_calendar_start {callback_query.message.chat.id}')
     calendar = aiogram_calendar.SimpleCalendar(show_alerts=True)
     calendar.set_dates_range(datetime(2022, 1, 1), datetime(2030, 12, 31))
     selected, date = await calendar.process_selection(callback_query, callback_data)
@@ -67,6 +69,13 @@ async def process_simple_calendar_start(callback_query: CallbackQuery, callback_
 
 @router.callback_query(lambda callback: 'slot' in callback.data)
 async def get_time_slot(callback: CallbackQuery, state: FSMContext, bot: Bot):
+    """
+    Выбор слота для записи
+    :param callback:
+    :param state:
+    :param bot:
+    :return:
+    """
     logging.info(f'get_time_slot {callback.message.chat.id}')
     slot_time = callback.data.split('_')[1]
     if slot_time == '❌':

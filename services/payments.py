@@ -10,23 +10,22 @@ yookassa.Configuration.account_id = config.tg_bot.yookassa_id
 yookassa.Configuration.secret_key = config.tg_bot.yookassa_key
 
 
-def create_payment_(amount: str, chat_id: int, content: str):
-    payment = Payment.create({
-        "amount": {
-            "value": amount,
-            "currency": "RUB"
-        },
-        "confirmation": {
-            "type": "redirect",
-            "return_url": "https://t.me/dr_selina_bot"
-        },
-        "capture": True,
-        "description": content,
-        "metadata": {
-          "order_id": "37"
-        }
-    })
-
+# def create_payment_(amount: str, chat_id: int, content: str):
+#     payment = Payment.create({
+#         "amount": {
+#             "value": amount,
+#             "currency": "RUB"
+#         },
+#         "confirmation": {
+#             "type": "redirect",
+#             "return_url": "https://t.me/dr_selina_bot"
+#         },
+#         "capture": True,
+#         "description": content,
+#         "metadata": {
+#           "order_id": "37"
+#         }
+#     })
 
 
 def create_payment(amount: str, chat_id: int, content: str):

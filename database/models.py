@@ -16,7 +16,7 @@ class User(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     tg_id = mapped_column(Integer)
-    username: Mapped[str] = mapped_column(String(20))
+    username: Mapped[str] = mapped_column(String(20), default='none')
     fullname: Mapped[str] = mapped_column(String, default='none')
     phone: Mapped[str] = mapped_column(String, default='none')
 

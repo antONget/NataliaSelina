@@ -111,8 +111,11 @@ async def process_product_one_step(callback: CallbackQuery, state: FSMContext, b
     :return:
     """
     logging.info(f'process_product_one_step {callback.message.chat.id}')
-    await bot.delete_message(chat_id=callback.message.chat.id,
-                             message_id=callback.message.message_id)
+    try:
+        await bot.delete_message(chat_id=callback.message.chat.id,
+                                 message_id=callback.message.message_id)
+    except:
+        pass
     product = callback.data.split('_')[0]
     await state.update_data(product=product)
     if product == 'consultation':
@@ -168,9 +171,9 @@ async def process_sign_up(callback: CallbackQuery, state: FSMContext, bot: Bot, 
 
 
 @router.callback_query(F.data == 'sign_up')
-async def process_sign_up(callback: CallbackQuery, state: FSMContext, bot: Bot,  i18n: TranslatorRunner):
+async def process_sign_up_agreement(callback: CallbackQuery, state: FSMContext, bot: Bot,  i18n: TranslatorRunner):
     """
-    Обраьрика нажатие на кнопку "Записаться"
+    Обработка нажатие на кнопку "Записаться"
     :param callback:
     :param state:
     :param bot:
@@ -221,7 +224,7 @@ async def process_continue(callback: CallbackQuery, state: FSMContext, i18n: Tra
     logging.info(f'process_continue {callback.message.chat.id}')
     data = await state.get_data()
     if data['agreement'] == 'no':
-        await callback.answer(text=i18n.greement.requirement(), show_alert=True)
+        await callback.answer(text=i18n.agreement.requirement(), show_alert=True)
         return
     await callback.message.edit_text(text=i18n.get_fullname(),
                                      reply_markup=None)
@@ -309,43 +312,43 @@ async def get_phone_user(message: Message, state: FSMContext, i18n: TranslatorRu
                                                           amount=amount))
 
 
-@router.callback_query(F.data == 'wish_pay')
-async def wish_payment(callback: CallbackQuery, bot: Bot, state: FSMContext):
-    data = await state.get_data()
-    await bot.send_invoice(
-        chat_id=callback.message.chat.id,
-        title='Покупка',
-        description=data['content'],
-        payload=f'pay_{callback.message.chat.id}',
-        provider_token=config.tg_bot.yookassa_id,
-        currency='RUB',
-        start_parameter='test',
-        prices=[LabeledPrice(label="Руб.", amount=data["amount"]*100)]
-    )
-
-
-@router.pre_checkout_query()
-async def process_pre_checkout_query(pre_checkout_query: PreCheckoutQuery, bot: Bot):
-    logging.info('process_pre_checkout_query')
-    await bot.answer_pre_checkout_query(pre_checkout_query_id=pre_checkout_query.id, ok=True)
-
-
-@router.message(F.successful_payment)
-async def process_successful_payment(message: Message, state: FSMContext):
-    if message.successful_payment.invoice_payload == 'pay_{callback.message.chat.id}':
-        await message.answer(text='Платеж прошел успешно')
-        data = await state.get_data()
-        item = data['item']
-        if item == '1':
-            await message.answer(text='Пришлите материалы для консультации\n'
-                                      '📎 Прикрепите фото (можно несколько), видео или документ.')
-            await state.set_state(User.content)
-            await state.update_data(content=[])
-            await state.update_data(count=[])
-        else:
-            await set_calendar(message=message, state=state)
-    else:
-        await message.answer(text='Платеж не прошел')
+# @router.callback_query(F.data == 'wish_pay')
+# async def wish_payment(callback: CallbackQuery, bot: Bot, state: FSMContext):
+#     data = await state.get_data()
+#     await bot.send_invoice(
+#         chat_id=callback.message.chat.id,
+#         title='Покупка',
+#         description=data['content'],
+#         payload=f'pay_{callback.message.chat.id}',
+#         provider_token=config.tg_bot.yookassa_id,
+#         currency='RUB',
+#         start_parameter='test',
+#         prices=[LabeledPrice(label="Руб.", amount=data["amount"]*100)]
+#     )
+#
+#
+# @router.pre_checkout_query()
+# async def process_pre_checkout_query(pre_checkout_query: PreCheckoutQuery, bot: Bot):
+#     logging.info('process_pre_checkout_query')
+#     await bot.answer_pre_checkout_query(pre_checkout_query_id=pre_checkout_query.id, ok=True)
+#
+#
+# @router.message(F.successful_payment)
+# async def process_successful_payment(message: Message, state: FSMContext):
+#     if message.successful_payment.invoice_payload == 'pay_{callback.message.chat.id}':
+#         await message.answer(text='Платеж прошел успешно')
+#         data = await state.get_data()
+#         item = data['item']
+#         if item == '1':
+#             await message.answer(text='Пришлите материалы для консультации\n'
+#                                       '📎 Прикрепите фото (можно несколько), видео или документ.')
+#             await state.set_state(User.content)
+#             await state.update_data(content=[])
+#             await state.update_data(count=[])
+#         else:
+#             await set_calendar(message=message, state=state)
+#     else:
+#         await message.answer(text='Платеж не прошел')
 
 
 @router.callback_query(F.data.startswith('payment_'))
@@ -376,7 +379,8 @@ async def check_pay(callback: CallbackQuery, state: FSMContext, bot: Bot):
         else:
             await set_calendar(message=callback.message, state=state)
     else:
-        await callback.message.answer(text='Платеж не прошел')
+        await callback.message.answer(text='Платеж не подтвержден, если вы совершили платеж, то попробуйте проверить'
+                                           ' его немного позднее или обратитесь в Поддержку в разделе Главного меню')
     await callback.answer()
 
 
@@ -446,7 +450,7 @@ async def send_add_content(callback: CallbackQuery, state: FSMContext, bot: Bot)
                                          reply_markup=None)
         data = await state.get_data()
         content = data['content']
-        print(content)
+
         for admin in config.tg_bot.admin_ids.split(','):
             try:
                 # content_list = content.split(',')
