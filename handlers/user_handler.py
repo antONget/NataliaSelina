@@ -10,7 +10,7 @@ from filter.admin_filter import IsSuperAdmin
 from config_data.config import Config, load_config
 from database import requests as rq
 from filter.filter import validate_russian_phone_number
-from services.payments import create_payment, check_payment, create_payment_
+from services.payments import create_payment, check_payment
 from handlers.hadler_calendar import set_calendar
 from fluentogram import TranslatorRunner
 
