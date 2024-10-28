@@ -445,9 +445,9 @@ async def send_add_content(callback: CallbackQuery, state: FSMContext, bot: Bot)
         await callback.message.edit_text(text='Пришлите материалы для консультации\n'
                                               '📎 Прикрепите фото (можно несколько), видео или документ.')
     else:
-        await callback.message.edit_text(text='Материалы от вас переданы\n\n'
-                                              'Спасибо! С вами свяжутся',
+        await callback.message.edit_text(text='Материалы от вас переданы\n\n',
                                          reply_markup=None)
+        await set_calendar(message=callback.message, state=state)
         data = await state.get_data()
         content = data['content']
 

@@ -11,24 +11,26 @@ def keyboard_start_menu():
     button_6 = InlineKeyboardButton(text='Менторство врачей', callback_data=f'mentoring_product')
     button_4 = InlineKeyboardButton(text='👤/👥 КАК ВЫБРАТЬ ПРОГРАММУ?', callback_data=f'select_product')
     button_5 = InlineKeyboardButton(text='👩‍💻 ПОДДЕРЖКА', callback_data=f'support')
+    button_7 = InlineKeyboardButton(text='Оставить отзыв', callback_data=f'set_feedback')
 
     keyboard = InlineKeyboardMarkup(inline_keyboard=[[button_1], [button_2], [button_3],
-                                                     [button_6], [button_4], [button_5]],)
+                                                     [button_6], [button_4], [button_5],
+                                                     [button_7]],)
     return keyboard
 
 
-def keyboard_start_menu():
-    logging.info("keyboard_start_menu")
-    button_1 = InlineKeyboardButton(text='Экспресс -консультация',  callback_data=f'consultation_product')
-    button_2 = InlineKeyboardButton(text='Оздоровительная программа', callback_data=f'wellness_product')
-    button_3 = InlineKeyboardButton(text='Программа похудения', callback_data=f'weightloss_product')
-    button_6 = InlineKeyboardButton(text='Медийный врач', callback_data=f'mentoring_product')
-    button_4 = InlineKeyboardButton(text='👤/👥 КАК ВЫБРАТЬ ПРОГРАММУ?', callback_data=f'select_product')
-    button_5 = InlineKeyboardButton(text='👩‍💻 ПОДДЕРЖКА', callback_data=f'support')
-
-    keyboard = InlineKeyboardMarkup(inline_keyboard=[[button_1], [button_2], [button_3],
-                                                     [button_6], [button_4], [button_5]],)
-    return keyboard
+# def keyboard_start_menu():
+#     logging.info("keyboard_start_menu")
+#     button_1 = InlineKeyboardButton(text='Экспресс -консультация',  callback_data=f'consultation_product')
+#     button_2 = InlineKeyboardButton(text='Оздоровительная программа', callback_data=f'wellness_product')
+#     button_3 = InlineKeyboardButton(text='Программа похудения', callback_data=f'weightloss_product')
+#     button_6 = InlineKeyboardButton(text='Медийный врач', callback_data=f'mentoring_product')
+#     button_4 = InlineKeyboardButton(text='👤/👥 КАК ВЫБРАТЬ ПРОГРАММУ?', callback_data=f'select_product')
+#     button_5 = InlineKeyboardButton(text='👩‍💻 ПОДДЕРЖКА', callback_data=f'support')
+#
+#     keyboard = InlineKeyboardMarkup(inline_keyboard=[[button_1], [button_2], [button_3],
+#                                                      [button_6], [button_4], [button_5]],)
+#     return keyboard
 
 
 def keyboard_select_programm():

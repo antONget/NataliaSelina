@@ -4,21 +4,28 @@ from datetime import time, timedelta, datetime
 import logging
 
 
-def keyboards_slots(list_event: list):
+def keyboards_slots(list_event: list, event_item: str = '2'):
     """
     Клавиатура для вывода свободных слотов
-    :param list_orders:
-    :param block:
-    :param status_order:
+    :param list_event:
+    :param event_item:
     :return:
     """
     logging.info(f"keyboards_slots")
     kb_builder = InlineKeyboardBuilder()
     buttons = []
-    hour = 14
-    minute = 0
+    if event_item == '1':
+        hour = 18
+        minute = 0
+        time_stop = time(hour=20, minute=0)
+        delta_minute = 15
+    else:
+        hour = 14
+        minute = 0
+        time_stop = time(hour=18, minute=0)
+        delta_minute = 40
     my_time = time(hour=hour, minute=minute)
-    time_stop = time(hour=18, minute=0)
+
     while True:
         if my_time >= time_stop:
             break
@@ -34,7 +41,7 @@ def keyboards_slots(list_event: list):
                 buttons.append(InlineKeyboardButton(
                     text=text,
                     callback_data=button))
-                my_time = (datetime.combine(datetime.today(), my_time) + timedelta(minutes=40)).time()
+                my_time = (datetime.combine(datetime.today(), my_time) + timedelta(minutes=delta_minute)).time()
                 break
         else:
             text = f'{my_time.strftime("%H:%M")}'
@@ -43,7 +50,7 @@ def keyboards_slots(list_event: list):
                 text=text,
                 callback_data=button))
             # Увеличиваем время на 40 минут
-            my_time = (datetime.combine(datetime.today(), my_time) + timedelta(minutes=40)).time()
+            my_time = (datetime.combine(datetime.today(), my_time) + timedelta(minutes=delta_minute)).time()
 
     kb_builder.row(*buttons, width=3)
     return kb_builder.as_markup()

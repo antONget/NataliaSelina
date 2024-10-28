@@ -1,5 +1,5 @@
 import pprint
-
+from datetime import datetime
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 
@@ -13,7 +13,7 @@ class GoogleCalendar(object):
     # CALENDAR_ID = 'a.l.ponomarev1989@gmail.com'
     CALENDAR_ID = 'detox.tour.turkey@gmail.com'
     SCOPES = ['https://www.googleapis.com/auth/calendar']
-    # FILE_PATH = 'calendar_google.json'
+    # FILE_PATH = 'credentials.json'
     FILE_PATH = 'services/credentials.json'
 
 
@@ -49,14 +49,28 @@ class GoogleCalendar(object):
         return self.service.events().insert(calendarId=self.CALENDAR_ID,
                                             body=event).execute()
 
-    def get_event(self, data: str):
+    def get_event(self, data: str, event_time: str = '18:00'):
         list_event = self.service.events().list(calendarId=self.CALENDAR_ID).execute()
         filter_event = []
         for event in list_event['items']:
             if 'dateTime' in event['start'].keys():
                 if data in event['start']['dateTime']:
                     filter_event.append(event)
-        return filter_event
+        count_event = 0
+        if filter_event:
+            for event in filter_event:
+                hour = event['start']['dateTime'].split('T')[1].split(':')[0]
+                minute = event['start']['dateTime'].split('T')[1].split(':')[1]
+                s2 = f'{hour}:{minute}'
+                FMT = '%H:%M'
+                tdelta = datetime.strptime(event_time, FMT) - datetime.strptime(s2, FMT)
+                if event_time == '18:00':
+                    if 0 < (tdelta.seconds / 3600) and (tdelta.seconds / 3600) <= 4:
+                        count_event += 1
+                elif event_time == '20:00':
+                    if 0 < (tdelta.seconds / 3600) and (tdelta.seconds / 3600) <= 2:
+                        count_event += 1
+        return filter_event, count_event
 
 
 
@@ -73,6 +87,6 @@ calendarG = GoogleCalendar()
 #                        description='Проверка работы',
 #                        data_event='2024-09-26')
 # pprint.pprint(calendarG.get_calendar_list())
-# event = obj.get_event(data='2024-09-22')
+# event = calendarG.get_event(data='2024-09-24')
 # print(event)
 
