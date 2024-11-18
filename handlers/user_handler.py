@@ -120,12 +120,12 @@ async def process_product_one_step(callback: CallbackQuery, state: FSMContext, b
     await state.update_data(product=product)
     if product == 'consultation':
         await callback.message.answer_photo(
-            photo='AgACAgIAAxkBAAMhZu_WbD9IYueoX0PynH9dM5c8f1gAAtnmMRuCboBLtu9WsVsODsYBAAMCAAN4AAM2BA',
+            photo='AgACAgIAAxkBAAIMzGc7SLluZtzGkKpObIFWLjqWnkOmAALE7TEbpZDhSQABKx_XR833-wEAAwIAA3kAAzYE',
             caption=i18n.product.consultation(),
             reply_markup=kb.keyboard_consultation())
     elif product == 'wellness':
         await callback.message.answer_photo(
-            photo='AgACAgIAAxkBAAMkZu_YC4xAd5STB5P7OwnQjLGFH4cAAvLmMRuCboBL-PiUkB7vfHcBAAMCAAN4AAM2BA',
+            photo='AgACAgIAAxkBAAIMzmc7SbWB9StaoqXn56z3wwuCXSL9AALS7TEbpZDhScM72h3BL1aGAQADAgADeQADNgQ',
             caption=i18n.product.wellness(),
             reply_markup=kb.keyboard_wellness())
     elif product == 'weightloss':
