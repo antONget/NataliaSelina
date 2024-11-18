@@ -20,7 +20,7 @@ start-text = Добро пожаловать!
 
              YouTube — https://youtube.com/@dr.selinalife?si=tuBzLYeRxGsuqwH5
 
-             Meta* признана в России экстремистской организацией
+             <blockquote>Meta* признана в России экстремистской организацией</blockquote>
 support-text = Если у вас возникли вопросы по работе бота или у вас есть предложения, то можете написать {$support_username}
 select-programm = Выберите продукт чтобы узнать о нем подробнее
 """Консультация"""
