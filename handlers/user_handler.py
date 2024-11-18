@@ -156,8 +156,11 @@ async def process_sign_up(callback: CallbackQuery, state: FSMContext, bot: Bot, 
     if item in ['6', '9', '10']:
         await process_sign_up(callback=callback, state=state, bot=bot, i18n=i18n)
         return
-    await bot.delete_message(chat_id=callback.message.chat.id,
-                             message_id=callback.message.message_id)
+    try:
+        await bot.delete_message(chat_id=callback.message.chat.id,
+                                 message_id=callback.message.message_id)
+    except:
+        pass
 
     if item == 'indvidual':
         await callback.message.answer(text=i18n.get(f'detailed-description-{6}'),
