@@ -154,7 +154,8 @@ async def process_sign_up(callback: CallbackQuery, state: FSMContext, bot: Bot, 
     logging.info(f'process_sign_up {callback.message.chat.id}')
     item = callback.data.split("_")[-1]
     if item in ['6', '9', '10']:
-        await process_sign_up(callback=callback, state=state, bot=bot, i18n=i18n)
+        await state.update_data(item=item)
+        await process_sign_up_agreement(callback=callback, state=state, bot=bot, i18n=i18n)
         return
     try:
         await bot.delete_message(chat_id=callback.message.chat.id,
@@ -185,6 +186,7 @@ async def process_sign_up_agreement(callback: CallbackQuery, state: FSMContext, 
     """
     await state.update_data(agreement='no')
     data = await state.get_data()
+    print(data['item'])
     if data['item'] == '8':
         await bot.delete_message(chat_id=callback.message.chat.id,
                                  message_id=callback.message.message_id)
@@ -292,11 +294,14 @@ async def get_phone_user(message: Message, state: FSMContext, i18n: TranslatorRu
                     "3": "Составление индивидуальной оздоровительной программы на 3 месяца",
                     "4": "ВИП-программа по здоровью",
                     "5": "Ведение в группе онлайн-детокс",
-                    "6": "Программа похудения на 3 месяца",
-                    "7": "Программа похудения на 1 месяц",
-                    "8": "Менторство врачей"}
-    item_amount = {"1": "5000", "2": "12500", "3": "30000", "4": "27000",
-                   "5": "10000", "6": "90000", "7": "50000", "8": "300000"}
+                    "6": "Программа похудения на 1 месяц",
+                    "7": "Программа похудения в группе",
+                    "8": "Медийный врач",
+                    "9": "Программа похудения на 3 месяца",
+                    "10": "Программа похудения на 6 месяцев"}
+    item_amount = {"1": "4999", "2": "12500", "3": "29999", "4": "269999",
+                   "5": "9999", "6": "49999", "7": "50000", "8": "299999",
+                   "9": "89999", "10": "129999"}
     amount = item_amount[item]
     content = type_product[item]
     # amount = "10"
