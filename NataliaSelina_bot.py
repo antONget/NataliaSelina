@@ -40,8 +40,8 @@ async def main():
 
     # Инициализируем бот и диспетчер
     bot = Bot(token=config.tg_bot.token, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
-    storage = RedisStorage.from_url('redis://127.0.0.1:6379/3')
-    dp = Dispatcher(storage=storage)
+    storage = RedisStorage.from_url()
+    dp = Dispatcher()
     # Регистрируем router в диспетчере
     dp.include_router(user_handler.router)
     dp.include_router(hadler_calendar.router)
